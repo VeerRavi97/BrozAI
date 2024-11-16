@@ -33,7 +33,22 @@ function initialize() {
     }
 
     loadTabsAndRenderTree();
+
+    // Add event listeners for dynamic updates
+    chrome.tabs.onCreated.addListener(handleTabChange);
+    chrome.tabs.onRemoved.addListener(handleTabChange);
+    chrome.tabs.onUpdated.addListener(handleTabChange);
+    chrome.tabs.onMoved.addListener(handleTabChange);
+    chrome.tabs.onAttached.addListener(handleTabChange);
+    chrome.tabs.onDetached.addListener(handleTabChange);
   });
+}
+
+/**
+ * Handle changes in tab structure.
+ */
+function handleTabChange() {
+  loadTabsAndRenderTree();
 }
 
 /**
