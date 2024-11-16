@@ -1,0 +1,138 @@
+/* General Styling */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 300px; /* Fixed width for the sidebar */
+  box-sizing: border-box;
+}
+
+header {
+  padding: 10px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+#search-bar {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Tree Container */
+#tree-container {
+  padding: 10px;
+  overflow-y: auto;
+  flex-grow: 1;
+  background-color: #fafafa;
+  max-height: calc(100vh - 50px); /* Ensure it doesn’t overflow */
+}
+
+/* Tab Styling */
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.tab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.tab img {
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  border-radius: 2px;
+}
+
+.tab span {
+  flex-grow: 1;
+  font-size: 14px;
+  color: #333;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden; /* Prevent text from overflowing */
+}
+
+/* Close Button */
+.tab button {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tab button:hover {
+  background-color: #d9363e;
+}
+
+/* Child Tabs */
+.tab.child {
+  margin-left: 20px;
+}
+
+/* Collapsed Tabs */
+.collapsed .children {
+  display: none;
+}
+
+/* Dark Mode */
+body.dark-mode {
+  background-color: #1e1e1e;
+  color: #dcdcdc;
+}
+
+body.dark-mode header {
+  background-color: #2d2d2d;
+  border-bottom: 1px solid #444;
+}
+
+body.dark-mode .tab {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: #dcdcdc;
+}
+
+body.dark-mode .tab:hover {
+  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #search-bar {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: #dcdcdc;
+}
+
+body.dark-mode .tab button {
+  background-color: #d9363e;
+}
+
+body.dark-mode .tab button:hover {
+  background-color: #a12228;
+}
