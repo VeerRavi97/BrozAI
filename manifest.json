@@ -5,7 +5,8 @@
   "description": "Organize your browser tabs in a hierarchical tree structure.",
   "permissions": [
     "tabs",
-    "storage"
+    "storage",
+    "sidePanel"
   ],
   "action": {
     "default_popup": "sidebar/sidebar.html",
@@ -22,6 +23,9 @@
   },
   "background": {
     "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidebar/sidebar.html"
   },
   "host_permissions": [
     "<all_urls>"
