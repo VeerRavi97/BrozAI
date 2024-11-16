@@ -1,15 +1,17 @@
 /**
- * Sidebar JavaScript with Dynamic Tree Hierarchy.
+ * Sidebar JavaScript with Dynamic Tree Hierarchy and Sorting Options.
  */
 
 // Global variables for preferences
 let sortOrder = "desc"; // Default sort order
+let currentSortMode = "default"; // Tracks current sort mode: 'default' or 'recent'
 
 // DOM references
 const container = document.getElementById("tree-container");
 const searchBar = document.getElementById("search-bar");
 const themeToggle = document.getElementById("theme-toggle");
 const sortToggle = document.getElementById("sort-toggle");
+const recentSortToggle = document.getElementById("recent-sort-toggle");
 const sortIcon = document.getElementById("sort-icon");
 
 // Initialize the extension
@@ -42,13 +44,43 @@ function initialize() {
     chrome.tabs.onAttached.addListener(handleTabChange);
     chrome.tabs.onDetached.addListener(handleTabChange);
   });
+
+  // Add event listeners for sorting buttons
+  addSortingListeners();
+}
+
+/**
+ * Add event listeners for sorting buttons.
+ */
+function addSortingListeners() {
+  // Default sorting toggle
+  sortToggle.addEventListener("click", () => {
+    currentSortMode = "default"; // Switch to default sorting
+    sortOrder = sortOrder === "asc" ? "desc" : "asc"; // Toggle between ascending and descending
+    updateSortButton();
+    loadTabsAndRenderTree();
+
+    // Update button visuals
+    sortToggle.classList.add("active");
+    recentSortToggle.classList.remove("active");
+  });
+
+  // Recent sort toggle
+  recentSortToggle.addEventListener("click", () => {
+    currentSortMode = "recent"; // Switch to recent sorting
+    loadTabsAndRenderTree("recent");
+
+    // Update button visuals
+    recentSortToggle.classList.add("active");
+    sortToggle.classList.remove("active");
+  });
 }
 
 /**
  * Handle changes in tab structure.
  */
 function handleTabChange() {
-  loadTabsAndRenderTree();
+  loadTabsAndRenderTree(currentSortMode);
 }
 
 /**
@@ -68,14 +100,18 @@ function updateSortButton() {
 
 /**
  * Load tabs from the current window and render them as a tree structure.
+ * @param {string} sortBy - The sorting method ('default' or 'recent').
  */
-function loadTabsAndRenderTree() {
+function loadTabsAndRenderTree(sortBy = "default") {
   chrome.windows.getCurrent((currentWindow) => {
     chrome.tabs.query({ windowId: currentWindow.id }, (tabs) => {
-      if (sortOrder === "asc") {
-        tabs.sort((a, b) => a.index - b.index);
+      // Apply sorting logic
+      if (sortBy === "recent" || currentSortMode === "recent") {
+        tabs.sort((a, b) => b.lastAccessed - a.lastAccessed); // Sort by recent visits
+      } else if (sortOrder === "asc") {
+        tabs.sort((a, b) => a.index - b.index); // Default ascending
       } else {
-        tabs.sort((a, b) => b.index - a.index);
+        tabs.sort((a, b) => b.index - a.index); // Default descending
       }
 
       const tabTree = buildTabTree(tabs);
@@ -250,17 +286,6 @@ themeToggle.addEventListener("click", () => {
   themeToggle.textContent = isDarkMode ? "☀️" : "🌙";
   chrome.storage.sync.set({ darkMode: isDarkMode });
 });
-
-// Sort toggle functionality
-sortToggle.addEventListener("click", () => {
-  sortOrder = sortOrder === "asc" ? "desc" : "asc";
-  updateSortButton();
-  chrome.storage.sync.set({ sortOrder: sortOrder });
-  loadTabsAndRenderTree();
-});
-
-// DOM reference to the sidebar
-const sidebar = document.getElementById("sidebar");
 
 /**
  * Adjust the sidebar width to fit the Chrome Side Panel dynamically.
