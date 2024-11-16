@@ -1,11 +1,9 @@
-// background.js
-
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
 
-  // Set up the side panel
+  // Set up the side panel with the correct path
   chrome.sidePanel.setOptions({
-    path: "sidebar/sidebar.html", // Specify the path to the side panel HTML file
+    path: "sidebar/sidebar.html", // Path to the sidebar HTML
     enabled: true, // Enable the side panel
   });
 });

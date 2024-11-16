@@ -252,6 +252,19 @@ header {
   transition: background-color 0.1s, transform 0.1s;
 }
 
+/* Sidebar Styling */
+#sidebar {
+  top: 0;
+  left: 0;
+  width: 300px; /* Default width, adjusted dynamically */
+  max-width: 500px; /* Ensure it doesn’t exceed the panel size */
+  background-color: var(--background-color);
+  border-right: 1px solid var(--tab-border);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease; /* Smooth resizing */
+}
+
+
 /* Responsive Design Adjustments */
 @media (max-width: 250px) {
   .tab .close-button {

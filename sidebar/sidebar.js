@@ -181,15 +181,15 @@ function renderTab(tab, tree) {
   tabElement.appendChild(closeButton);
 
   // Add child tabs recursively
-  if (tree[tab.id]) {
-    const childrenContainer = document.createElement("div");
-    childrenContainer.className = "children";
-    tree[tab.id].forEach((childTab) => {
-      const childElement = renderTab(childTab, tree);
-      childrenContainer.appendChild(childElement);
-    });
-    tabElement.appendChild(childrenContainer);
-  }
+  // if (tree[tab.id]) {
+  //   const childrenContainer = document.createElement("div");
+  //   childrenContainer.className = "children";
+  //   tree[tab.id].forEach((childTab) => {
+  //     const childElement = renderTab(childTab, tree);
+  //     childrenContainer.appendChild(childElement);
+  //   });
+  //   tabElement.appendChild(childrenContainer);
+  // }
 
   // Add click functionality to activate the tab
   tabElement.addEventListener("click", () => {
@@ -257,4 +257,25 @@ sortToggle.addEventListener("click", () => {
   updateSortButton();
   chrome.storage.sync.set({ sortOrder: sortOrder });
   loadTabsAndRenderTree();
+});
+
+// DOM reference to the sidebar
+const sidebar = document.getElementById("sidebar");
+
+/**
+ * Adjust the sidebar width to fit the Chrome Side Panel dynamically.
+ */
+function adjustSidebarWidth() {
+  const sidePanelWidth = window.innerWidth; // Get the Chrome Side Panel width
+  sidebar.style.width = `${sidePanelWidth}px`; // Match the sidebar width to the panel width
+}
+
+/**
+ * Initialize the sidebar width adjustment for Chrome Side Panel.
+ */
+document.addEventListener("DOMContentLoaded", () => {
+  adjustSidebarWidth(); // Set initial width to fit the panel
+
+  // Adjust width dynamically when the Chrome Side Panel resizes
+  window.addEventListener("resize", adjustSidebarWidth);
 });

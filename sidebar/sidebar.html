@@ -7,19 +7,21 @@
   <link rel="stylesheet" href="sidebar.css">
 </head>
 <body>
-  <header>
-    <input type="text" id="search-bar" placeholder="Search tabs..." />
+  <div id="sidebar">
+    <header>
+      <input type="text" id="search-bar" placeholder="Search tabs..." />
+      
+      <!-- Sort Toggle Button -->
+      <button id="sort-toggle" title="Toggle Sort Order" aria-label="Toggle Sort Order">
+        <img id="sort-icon" src="../assets/arrow-down.svg" alt="Sort Descending" width="16" height="16">
+      </button>
+      
+      <button id="theme-toggle" title="Toggle Dark Mode">🌙</button>
+    </header>
     
-    <!-- Sort Toggle Button with Icon -->
-    <button id="sort-toggle" title="Toggle Sort Order" aria-label="Toggle Sort Order">
-      <img id="sort-icon" src="../assets/arrow-down.svg" alt="Sort Descending" width="16" height="16">
-    </button>
+    <div id="tree-container"></div>
     
-    <button id="theme-toggle" title="Toggle Dark Mode">🌙</button>
-  </header>
-  
-  <div id="tree-container"></div>
-  
+  </div>
   <script src="sidebar.js"></script>
 </body>
 </html>
