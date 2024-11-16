@@ -1,16 +1,60 @@
+// sidebar.js
+
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("tree-container");
   const searchBar = document.getElementById("search-bar");
   const themeToggle = document.getElementById("theme-toggle");
+  const sortToggle = document.getElementById("sort-toggle");
 
-  // Fetch and render tabs from the current window in correct order
+  let sortOrder = "desc"; // Default sort order
+
+  // Initialize the extension
+  initialize();
+
+  // Function to initialize the extension
+  function initialize() {
+    // Retrieve stored sort order and dark mode preference
+    chrome.storage.sync.get(["sortOrder", "darkMode"], (data) => {
+      if (data.sortOrder) {
+        sortOrder = data.sortOrder;
+        updateSortButton();
+      }
+
+      if (data.darkMode) {
+        document.body.classList.add("dark-mode");
+        themeToggle.textContent = "☀️";
+      } else {
+        themeToggle.textContent = "🌙";
+      }
+
+      loadTabsFromCurrentWindow();
+    });
+  }
+
+  // Update sort button icon based on sortOrder
+  function updateSortButton() {
+    if (sortOrder === "asc") {
+      sortToggle.textContent = "↑"; // Ascending
+      sortToggle.setAttribute("aria-label", "Sort Ascending");
+    } else {
+      sortToggle.textContent = "↓"; // Descending
+      sortToggle.setAttribute("aria-label", "Sort Descending");
+    }
+  }
+
+  // Fetch and render tabs from the current window in the selected order
   function loadTabsFromCurrentWindow() {
     chrome.windows.getCurrent((currentWindow) => {
       chrome.tabs.query({ windowId: currentWindow.id }, (tabs) => {
-        // Sort tabs by index to ensure correct order
-        tabs.sort((a, b) => a.index - b.index);
-        console.log("Sorted Tabs:", tabs); // Debugging
-        renderTabs(tabs); // Render tabs directly in order
+        // Sort tabs based on sortOrder
+        if (sortOrder === "asc") {
+          tabs.sort((a, b) => a.index - b.index);
+        } else {
+          tabs.sort((a, b) => b.index - a.index);
+        }
+
+        console.log(`Sorted Tabs (${sortOrder}):`, tabs); // Debugging
+        renderTabs(tabs); // Render tabs in the selected order
       });
     });
   }
@@ -31,8 +75,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Add favicon
     const favicon = document.createElement("img");
-    favicon.src = tab.favIconUrl || "default-icon.png";
+    favicon.src = tab.favIconUrl || "assets/default-icon.png";
     favicon.alt = "Tab Icon";
+    favicon.onerror = () => {
+      favicon.src = "assets/default-icon.png"; // Fallback if favicon fails to load
+    };
     tabElement.appendChild(favicon);
 
     // Add tab title
@@ -43,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Add close button
     const closeButton = document.createElement("button");
     closeButton.textContent = "X";
+    closeButton.className = "close-button";
     closeButton.addEventListener("click", (e) => {
       e.stopPropagation();
       chrome.tabs.remove(tab.id); // Close the tab
@@ -73,10 +121,34 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.toggle("dark-mode");
     const isDarkMode = document.body.classList.contains("dark-mode");
     themeToggle.textContent = isDarkMode ? "☀️" : "🌙";
+    // Save dark mode preference
+    chrome.storage.sync.set({ darkMode: isDarkMode }, () => {
+      if (chrome.runtime.lastError) {
+        console.error(
+          "Error saving theme preference:",
+          chrome.runtime.lastError
+        );
+      }
+    });
   });
 
-  // Load tabs from the current window on initialization
-  loadTabsFromCurrentWindow();
+  // Sort toggle functionality
+  sortToggle.addEventListener("click", () => {
+    // Toggle sort order
+    sortOrder = sortOrder === "asc" ? "desc" : "asc";
+    updateSortButton();
+    // Save sort order preference
+    chrome.storage.sync.set({ sortOrder: sortOrder }, () => {
+      if (chrome.runtime.lastError) {
+        console.error(
+          "Error saving sort order preference:",
+          chrome.runtime.lastError
+        );
+      }
+    });
+    // Reload tabs in the new order
+    loadTabsFromCurrentWindow();
+  });
 
   // Refresh tabs when updated or removed
   chrome.tabs.onUpdated.addListener(() => {
@@ -84,6 +156,22 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   chrome.tabs.onRemoved.addListener(() => {
+    loadTabsFromCurrentWindow();
+  });
+
+  chrome.tabs.onCreated.addListener(() => {
+    loadTabsFromCurrentWindow();
+  });
+
+  chrome.tabs.onMoved.addListener(() => {
+    loadTabsFromCurrentWindow();
+  });
+
+  chrome.tabs.onAttached.addListener(() => {
+    loadTabsFromCurrentWindow();
+  });
+
+  chrome.tabs.onDetached.addListener(() => {
     loadTabsFromCurrentWindow();
   });
 });

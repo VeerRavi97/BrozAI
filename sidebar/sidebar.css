@@ -1,34 +1,111 @@
+/* sidebar.css */
+
+/* Define CSS Variables */
+:root {
+  --background-color: #f9f9f9;
+  --header-background: #ffffff;
+  --tab-background: #ffffff;
+  --tab-border: #ddd;
+  --text-color: #333;
+  --close-button-bg: #ff4d4f;
+  --close-button-hover-bg: #d9363e;
+  --toggle-button-hover-color: #007bff;
+  --search-bar-bg: #ffffff;
+  --search-bar-border: #ddd;
+  --search-bar-text: #333;
+  --placeholder-color: #888;
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+  --background-color: #1e1e1e;
+  --header-background: #2d2d2d;
+  --tab-background: #2d2d2d;
+  --tab-border: #444;
+  --text-color: #dcdcdc;
+  --close-button-bg: #d9363e;
+  --close-button-hover-bg: #a12228;
+  --toggle-button-hover-color: #66b2ff;
+  --search-bar-bg: #2d2d2d;
+  --search-bar-border: #444;
+  --search-bar-text: #dcdcdc;
+  --placeholder-color: #888;
+}
+
 /* General Styling */
 body {
   font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
-  color: #333;
+  background-color: var(--background-color);
+  color: var(--text-color);
   display: flex;
   flex-direction: column;
   height: 100%;
   width: 300px; /* Fixed width for the sidebar */
   box-sizing: border-box;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 header {
   padding: 10px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #ddd;
+  background-color: var(--header-background);
+  border-bottom: 1px solid var(--tab-border);
   display: flex;
   align-items: center;
   box-sizing: border-box;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 
 #search-bar {
   flex: 1;
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--search-bar-border);
   border-radius: 5px;
   font-size: 14px;
   outline: none;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  background-color: var(--search-bar-bg);
+  color: var(--search-bar-text);
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+#search-bar::placeholder {
+  color: var(--placeholder-color);
+}
+
+#search-bar:focus {
+  border-color: #007bff;
+}
+
+#sort-toggle {
+  margin-left: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  outline: none;
+  color: var(--text-color);
+  transition: color 0.3s;
+}
+
+#sort-toggle:hover {
+  color: var(--toggle-button-hover-color);
+}
+
+#theme-toggle {
+  margin-left: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  outline: none;
+  color: var(--text-color);
+  transition: color 0.3s;
+}
+
+#theme-toggle:hover {
+  color: var(--toggle-button-hover-color);
 }
 
 /* Tree Container */
@@ -36,23 +113,25 @@ header {
   padding: 10px;
   overflow-y: auto;
   flex-grow: 1;
-  background-color: #fafafa;
+  background-color: var(--background-color);
   max-height: calc(100vh - 50px); /* Ensure it doesn’t overflow */
+  transition: background-color 0.3s;
 }
 
 /* Tab Styling */
 .tab {
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 5px 10px;
   margin: 5px 0;
-  border: 1px solid #ddd;
+  border: 1px solid var(--tab-border);
   border-radius: 8px;
-  background-color: #ffffff;
+  background-color: var(--tab-background);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, border-color 0.3s;
   cursor: pointer;
   box-sizing: border-box;
+  position: relative; /* For positioning toggle button */
 }
 
 .tab:hover {
@@ -70,15 +149,16 @@ header {
 .tab span {
   flex-grow: 1;
   font-size: 14px;
-  color: #333;
+  color: var(--text-color);
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden; /* Prevent text from overflowing */
+  transition: color 0.3s;
 }
 
 /* Close Button */
-.tab button {
-  background-color: #ff4d4f;
+.tab .close-button {
+  background-color: var(--close-button-bg);
   color: white;
   border: none;
   padding: 4px 8px;
@@ -88,51 +168,30 @@ header {
   transition: background-color 0.2s;
 }
 
-.tab button:hover {
-  background-color: #d9363e;
+.tab .close-button:hover {
+  background-color: var(--close-button-hover-bg);
 }
 
-/* Child Tabs */
-.tab.child {
+/* Toggle Button */
+.tab .toggle-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  margin-right: 5px;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  outline: none;
+  color: var(--text-color);
+  transition: color 0.3s;
+}
+
+.tab .toggle-button:hover {
+  color: var(--toggle-button-hover-color);
+}
+
+/* Child Tabs Container */
+.children {
   margin-left: 20px;
-}
-
-/* Collapsed Tabs */
-.collapsed .children {
-  display: none;
-}
-
-/* Dark Mode */
-body.dark-mode {
-  background-color: #1e1e1e;
-  color: #dcdcdc;
-}
-
-body.dark-mode header {
-  background-color: #2d2d2d;
-  border-bottom: 1px solid #444;
-}
-
-body.dark-mode .tab {
-  background-color: #2d2d2d;
-  border-color: #444;
-  color: #dcdcdc;
-}
-
-body.dark-mode .tab:hover {
-  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
-}
-
-body.dark-mode #search-bar {
-  background-color: #2d2d2d;
-  border-color: #444;
-  color: #dcdcdc;
-}
-
-body.dark-mode .tab button {
-  background-color: #d9363e;
-}
-
-body.dark-mode .tab button:hover {
-  background-color: #a12228;
 }
