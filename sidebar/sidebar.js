@@ -1,10 +1,29 @@
 // sidebar.js
 
+/**
+ * Extracts and shortens the URL to display the hostname.
+ * @param {string} url - The full URL of the tab.
+ * @returns {string} - The shortened URL (hostname).
+ */
+function getShortenedURL(url) {
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.replace("www.", "");
+    const parts = hostname.split(".");
+    // Display only the last two parts (e.g., example.com)
+    return parts.slice(-2).join(".");
+  } catch (error) {
+    console.error("Invalid URL:", url);
+    return "Invalid URL";
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("tree-container");
   const searchBar = document.getElementById("search-bar");
   const themeToggle = document.getElementById("theme-toggle");
   const sortToggle = document.getElementById("sort-toggle");
+  const sortIcon = document.getElementById("sort-icon");
 
   let sortOrder = "desc"; // Default sort order
 
@@ -34,11 +53,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Update sort button icon based on sortOrder
   function updateSortButton() {
     if (sortOrder === "asc") {
-      sortToggle.textContent = "↑"; // Ascending
+      sortToggle.classList.add("asc"); // Rotate the icon via CSS
       sortToggle.setAttribute("aria-label", "Sort Ascending");
+      sortIcon.alt = "Sort Ascending";
     } else {
-      sortToggle.textContent = "↓"; // Descending
+      sortToggle.classList.remove("asc"); // Default orientation
       sortToggle.setAttribute("aria-label", "Sort Descending");
+      sortIcon.alt = "Sort Descending";
     }
   }
 
@@ -62,10 +83,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Render the tabs in order
   function renderTabs(tabs) {
     container.innerHTML = ""; // Clear previous content
-    tabs.forEach((tab) => renderTab(tab)); // Render each tab
+    const fragment = document.createDocumentFragment(); // Use Document Fragment for performance
+    tabs.forEach((tab) => {
+      const tabElement = renderTab(tab);
+      fragment.appendChild(tabElement);
+    });
+    container.appendChild(fragment); // Append all tabs at once
   }
 
-  // Render individual tabs
+  /**
+   * Renders an individual tab entry in the sidebar.
+   * @param {object} tab - The tab object containing information about the tab.
+   * @returns {HTMLElement} - The DOM element representing the tab.
+   */
   function renderTab(tab) {
     if (!tab) return; // Skip if the tab no longer exists
 
@@ -82,8 +112,16 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     tabElement.appendChild(favicon);
 
+    // Add shortened URL
+    const url = document.createElement("span");
+    url.className = "tab-url";
+    url.textContent = getShortenedURL(tab.url); // Use the helper function
+    url.title = tab.url; // Add tooltip with full URL
+    tabElement.appendChild(url);
+
     // Add tab title
     const title = document.createElement("span");
+    title.className = "tab-title";
     title.textContent = tab.title || `Tab ${tab.id}`;
     tabElement.appendChild(title);
 
@@ -102,17 +140,18 @@ document.addEventListener("DOMContentLoaded", () => {
       chrome.tabs.update(tab.id, { active: true }); // Activate the tab
     });
 
-    // Append to container
-    container.appendChild(tabElement);
+    return tabElement; // Return the constructed tab element
   }
 
   // Search functionality
   searchBar.addEventListener("input", (e) => {
     const query = e.target.value.toLowerCase();
-    const tabs = document.querySelectorAll(".tab span");
+    const tabs = document.querySelectorAll(".tab");
     tabs.forEach((tab) => {
-      const title = tab.textContent.toLowerCase();
-      tab.parentElement.style.display = title.includes(query) ? "flex" : "none";
+      const title = tab.querySelector(".tab-title").textContent.toLowerCase();
+      const url = tab.querySelector(".tab-url").textContent.toLowerCase();
+      tab.style.display =
+        title.includes(query) || url.includes(query) ? "flex" : "none";
     });
   });
 
@@ -150,28 +189,22 @@ document.addEventListener("DOMContentLoaded", () => {
     loadTabsFromCurrentWindow();
   });
 
+  // Debounced loadTabsFromCurrentWindow for performance
+  function debounce(func, delay) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  const debouncedLoadTabs = debounce(loadTabsFromCurrentWindow, 300);
+
   // Refresh tabs when updated or removed
-  chrome.tabs.onUpdated.addListener(() => {
-    loadTabsFromCurrentWindow();
-  });
-
-  chrome.tabs.onRemoved.addListener(() => {
-    loadTabsFromCurrentWindow();
-  });
-
-  chrome.tabs.onCreated.addListener(() => {
-    loadTabsFromCurrentWindow();
-  });
-
-  chrome.tabs.onMoved.addListener(() => {
-    loadTabsFromCurrentWindow();
-  });
-
-  chrome.tabs.onAttached.addListener(() => {
-    loadTabsFromCurrentWindow();
-  });
-
-  chrome.tabs.onDetached.addListener(() => {
-    loadTabsFromCurrentWindow();
-  });
+  chrome.tabs.onUpdated.addListener(debouncedLoadTabs);
+  chrome.tabs.onRemoved.addListener(debouncedLoadTabs);
+  chrome.tabs.onCreated.addListener(debouncedLoadTabs);
+  chrome.tabs.onMoved.addListener(debouncedLoadTabs);
+  chrome.tabs.onAttached.addListener(debouncedLoadTabs);
+  chrome.tabs.onDetached.addListener(debouncedLoadTabs);
 });
