@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Tree-Style Tabs",
+  "name": "BrozAI",
   "version": "1.0",
   "description": "Organize your browser tabs in a hierarchical tree structure.",
   "permissions": [
@@ -11,15 +11,15 @@
   "action": {
     "default_popup": "sidebar/sidebar.html",
     "default_icon": {
-      "16": "assets/default-icon.png",
-      "48": "assets/default-icon.png",
-      "128": "assets/default-icon.png"
+      "16": "icons/icon.png",
+      "48": "icons/icon.png",
+      "128": "icons/icon.png"
     }
   },
   "icons": {
-    "16": "assets/default-icon.png",
-    "48": "assets/default-icon.png",
-    "128": "assets/default-icon.png"
+    "16": "icons/icon.png",
+    "48": "icons/icon.png",
+    "128": "icons/icon.png"
   },
   "background": {
     "service_worker": "background.js"
